@@ -1,13 +1,14 @@
 import json
 
 def login():
-    print("\nPlease enter your login credentials:")
+    print("\nPlease enter your login info:")
     email = input("Email: ")
     password = input("Password: ")
     try:
-        with open('users.json', 'r') as file:
-            users_data = json.load(file)
-    except FileNotFoundError:
+        file = open('users.json', 'r')
+        users_data = json.load(file)
+        file.close()
+    except:
         users_data = []
     
     for user in users_data:
