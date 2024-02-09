@@ -16,7 +16,7 @@ def main():
     projects = get_projects()
     
     while True:
-        print("\033[93mWelcome to Fundraise App!\033[0m")
+        print("\033[93m\nWelcome to Fundraise App!\033[0m")
         print("1. Register")
         print("2. Login")
         print("3. Exit")
@@ -46,6 +46,7 @@ def main():
                     else:
                         print("\033[91m\nInvalid choice. Please try again.\033[0m")
         elif choice == '3':
+            print("Exited.")
             break
         else:
             print("\033[91m\nInvalid choice. Please try again.\033[0m")
