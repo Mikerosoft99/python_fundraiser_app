@@ -1,65 +1,132 @@
 import json
 import datetime
 
-def validate_date(date_text):
+def validate_date(date):
     try:
-        datetime.datetime.strptime(date_text, '%Y-%m-%d')
+        datetime.datetime.strptime(date, '%Y-%m-%d')
         return True
     except ValueError:
         return False
 
 def create_project(projects, user_email):
-    print("Please enter project details:")
-    title = input("Title: ")
-    details = input("Details: ")
-    total_target = float(input("Total target (Ex. 10000 EGP): "))
-    start_time = input("Start time (YYYY-MM-DD): ")
+    print("\nPlease enter project details:")
+    title = input("Title: ").title()
+    details = input("Details: ").capitalize()
+    while True:
+        try:
+            total_target = float(input("Total target (Ex. 10000 EGP): "))
+            break
+        except ValueError:
+            print("\033[91m\nInvalid input. Please enter a valid number.\033[0m\n")
+
+    while True:
+        start_time = input("Start time (YYYY-MM-DD): ")
+        if not validate_date(start_time):
+            print("\033[91m\nInvalid date format.\033[0m")
+        else:
+            break
+    
+    while True:
+        end_time = input("End time (YYYY-MM-DD): ")
+        if not validate_date(end_time):
+            print("\033[91m\nInvalid date format.\033[0m")
+        elif start_time >= end_time:
+            print("\033[91m\nEnd time must be after start time.\033[0m")
+        else:
+            break
+
+    new_project = {'title': title,
+                'details': details,
+                'total_target': total_target,
+                'start_time': start_time,
+                'end_time': end_time,
+                'owner': user_email}
+
+    projects.append(new_project)
+
+    file = open('projects.json', 'w')
+    json.dump(projects, file, indent=1)
+    file.close()
+    print("\033[92m\nProject created successfully!\033[0m")
+
+def view_projects(projects):
+    print("\nAll Projects:\n")
+    for project in projects:
+        print(f"Title: {project['title']}")
+        print(f"Details: {project['details']}")
+        print(f"Total Target: {project['total_target']} EGP")
+        print(f"Start Time: {project['start_time']}")
+        print(f"End Time: {project['end_time']}")
+        print(f"Owned by: {project['owner']}")
+        print("="*30)
+
+def edit_project(projects, user_email):
+    print("\nPlease select a project to edit:")
+
+    for i, project in enumerate(projects):
+        print(f"{i + 1}. {project['title']}")
+    choice = int(input("Enter the number of the project you want to edit: "))
+
+    choice -= 1
+
+    if choice < 0 or choice >= len(projects):
+        print("\033[91m\nInvalid project number.\033[0m")
+        return
+
+    selected_project = projects[choice]
+    
+    if selected_project['owner'] != user_email:
+        print("You are not the owner of this project. Access denied.")
+        return
+
+    print("Edit project:")
+    selected_project['title'] = input(f"New title ({selected_project['title']}): ")
+
+    selected_project['details'] = input(f"New details ({selected_project['details']}): ")
+
+    selected_project['total_target'] = float(input(f"New total target ({selected_project['total_target']} EGP): "))
+
+    start_time = input(f"New start time ({selected_project['start_time']}): ")
     if not validate_date(start_time):
         print("Invalid date format.")
         return
-    end_time = input("End time (YYYY-MM-DD): ")
+    selected_project['start_time'] = start_time
+
+    end_time = input(f"New end time ({selected_project['end_time']}): ")
     if not validate_date(end_time):
         print("Invalid date format.")
         return
-    projects[title] = {'title': title,
-                       'details': details,
-                       'total_target': total_target,
-                       'start_time': start_time,
-                       'end_time': end_time,
-                       'owner': user_email}
-    with open('projects.json', 'w') as f:
-        json.dump(projects, f)
-    print("Project created successfully!")
+    selected_project['end_time'] = end_time
 
-def view_projects(projects):
-    print("All Projects:")
-    for project in projects.values():
-        print(project)
+    file = open('projects.json', 'w')
+    json.dump(projects, file, indent=1)
+    file.close()
 
-def edit_project(projects, user_email):
-    print("Please select a project to edit:")
-    for i, project in enumerate(projects.values()):
-        print(f"{i + 1}. {project['title']}")
-    choice = int(input("Enter the number corresponding to the project you want to edit: "))
-    project_titles = list(projects.keys())
-    selected_project_title = project_titles[choice - 1]
-    if projects[selected_project_title]['owner'] == user_email:
-        print("Edit project:")
-        # not implemented yet
-    else:
-        print("You are not the owner of this project. Access denied.")
+    print("\033[92m\nProject edited successfully!\033[0m")
 
 def delete_project(projects, user_email):
     print("Please select a project to delete:")
-    for i, project in enumerate(projects.values()):
+    for i, project in enumerate(projects):
         print(f"{i + 1}. {project['title']}")
-    choice = int(input("Enter the number corresponding to the project you want to delete: "))
-    project_titles = list(projects.keys())
-    selected_project_title = project_titles[choice - 1]
-    if projects[selected_project_title]['owner'] == user_email:
-        del projects[selected_project_title]
-        with open('projects.json', 'w') as f:
-            json.dump(projects, f)
-        print("Project deleted successfully!")
+    choice = int(input("Enter the number of the project you want to delete: "))
+
+    choice -= 1
+
+    if choice < 0 or choice >= len(projects):
+        print("\033[91m\nInvalid project number.\033[0m")
+        return
+
+    selected_project = projects[choice]
+
+    if selected_project['owner'] == user_email:
+        confirmation = input(f"Are you sure you want to delete '{selected_project['title']}'? (yes/no): ")
+        if confirmation.lower() == 'yes':
+            del projects[choice]
+            file = open('projects.json', 'w')
+            json.dump(projects, file, indent=1)
+            file.close()
+            print("Project deleted successfully!")
+        else:
+            print("Deletion canceled.")
     else:
-        print("You are not the owner of this project. Access denied.")
+        print("Access denied: You are not the owner of this project.")

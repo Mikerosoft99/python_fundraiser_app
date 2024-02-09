@@ -1,18 +1,18 @@
 import json
 
-def login(users):
-    print("Please enter your login credentials:")
+def login():
+    print("\nPlease enter your login credentials:")
     email = input("Email: ")
     password = input("Password: ")
     try:
-        file = open('users.json', 'r')
-        users_data = json.load(file)
-        file.close()
+        with open('users.json', 'r') as file:
+            users_data = json.load(file)
     except FileNotFoundError:
         users_data = []
-    if email in users_data and users_data[email]['password'] == password:
-        print("Login successful!")
-        return email
-    else:
-        print("Invalid email or password.")
-        return None
+    
+    for user in users_data:
+        if user["email"] == email and user["password"] == password:
+            print("\033[92m\nLogin successful!\033[0m")
+            return email
+    print("\033[91m\nInvalid email or password.\033[0m")
+    return None

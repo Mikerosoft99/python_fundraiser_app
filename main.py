@@ -1,39 +1,30 @@
 import json
-import login
-import register
-import projectCRUD
-
-
-def get_users():
-    try:
-        file = open('users.json', 'r')
-        file.close()
-        return json.load(file)
-    except:
-        return []
+from login import login 
+from register import register
+from projectCRUD import create_project, edit_project, view_projects, delete_project
 
 def get_projects():
     try:
         file = open('projects.json', 'r')
+        projects = json.load(file)
         file.close()
-        return json.load(file)
+        return projects
     except:
         return []
-    
+
 def main():
-    users = get_users
-    projects = get_projects
+    projects = get_projects()
     
     while True:
-        print("\nWelcome to Fundraise App!")
+        print("\033[93mWelcome to Fundraise App!\033[0m")
         print("1. Register")
         print("2. Login")
         print("3. Exit")
         choice = input("Enter your choice: ")
         if choice == '1':
-            register.register(users)
+            register()
         elif choice == '2':
-            user_email = login.login(users)
+            user_email = login()
             if user_email:
                 while True:
                     print("\n1. Create Project")
@@ -43,21 +34,21 @@ def main():
                     print("5. Logout")
                     inner_choice = input("Enter your choice: ")
                     if inner_choice == '1':
-                        projectCRUD.create_project(projects, user_email)
+                        create_project(projects, user_email)
                     elif inner_choice == '2':
-                        projectCRUD.view_projects(projects)
+                        view_projects(projects)
                     elif inner_choice == '3':
-                        projectCRUD.edit_project(projects, user_email)
+                        edit_project(projects, user_email)
                     elif inner_choice == '4':
-                        projectCRUD.delete_project(projects, user_email)
+                        delete_project(projects, user_email)
                     elif inner_choice == '5':
                         break
                     else:
-                        print("Invalid choice. Please try again.")
+                        print("\033[91m\nInvalid choice. Please try again.\033[0m")
         elif choice == '3':
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("\033[91m\nInvalid choice. Please try again.\033[0m")
 
 if __name__ == "__main__":
     main()
