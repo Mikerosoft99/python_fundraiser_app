@@ -12,7 +12,8 @@ def register():
     try:
         file = open('users.json', 'r')
         users = json.load(file)
-    except FileNotFoundError:
+        file.close()
+    except:
         users = []
     print("Please enter your registration info:")
 
@@ -35,15 +36,19 @@ def register():
 
     # Password
     password = input("Password: ")
+    if len(password) < 8:
+        print("\033[91m\nPassword must be at least 8 characters long.\033[0m")
+        return
+    
     confirm_password = input("Confirm password: ")
     if password != confirm_password:
         print("\033[91m\nPasswords don't match.\033[0m")
         return
 
     # Phone Number
-    phone = input("Mobile phone: ")
+    phone = input("Phone Number (Egyptian): ")
     if not validate_phone(phone):
-        print("\033[91m\nInvalid phone number format. Please enter a valid Egyptian phone number.\033[0m")
+        print("\033[91m\nInvalid phone number. Please enter an Egyptian phone number format.\033[0m")
         return
 
     user_data = {'first_name': first_name,
