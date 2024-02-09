@@ -31,7 +31,7 @@ def create_project(projects, user_email):
         if not validate_date(end_time):
             print("\033[91m\nInvalid date format.\033[0m")
         elif start_time >= end_time:
-            print("\033[91m\nEnd time must be after start time.\033[0m")
+            print("\033[91m\nEnd time must be after start time.\033[0m\n")
         else:
             break
 
@@ -82,7 +82,7 @@ def edit_project(projects, user_email):
     selected_project = projects[choice]
     
     if selected_project['owner'] != user_email:
-        print("\033[91m\nYou are not the owner of this project. Access denied.\033[0m")
+        print("\033[91m\nAccess denied: You are not the owner of this project.\033[0m")
         return
 
     print("Edit project:")
@@ -142,6 +142,6 @@ def delete_project(projects, user_email):
             file.close()
             print("\033[92mProject deleted successfully!\033[0m")
         else:
-            print("\033[91mDeletion canceled.\033[0m")
+            print("\033[91mDeletion canceled.\033[0m\n")
     else:
-        print("\033[91m\nYou are not the owner of this project. Access denied.\033[0m")
+        print("\033[91m\nAccess denied: You are not the owner of this project.\033[0m")
