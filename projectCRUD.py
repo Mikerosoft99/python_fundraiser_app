@@ -14,7 +14,7 @@ def create_project(projects, user_email):
     details = input("Details: ").capitalize()
     while True:
         try:
-            total_target = float(input("Total target (Ex. 10000 EGP): "))
+            total_target = float(input("Total target (i.e. 10000 EGP): "))
             break
         except ValueError:
             print("\033[91m\nInvalid input. Please enter a valid number.\033[0m\n")
@@ -50,7 +50,8 @@ def create_project(projects, user_email):
     print("\033[92m\nProject created successfully!\033[0m")
 
 def view_projects(projects):
-    print("\nAll Projects:\n")
+    print("\nAll Projects:")
+    print("-"*30)
     for project in projects:
         print(f"Title: {project['title']}")
         print(f"Details: {project['details']}")
@@ -58,14 +59,19 @@ def view_projects(projects):
         print(f"Start Time: {project['start_time']}")
         print(f"End Time: {project['end_time']}")
         print(f"Owned by: {project['owner']}")
-        print("="*30)
+        print("-"*30)
 
 def edit_project(projects, user_email):
     print("\nPlease select a project to edit:")
 
     for i, project in enumerate(projects):
         print(f"{i + 1}. {project['title']}")
-    choice = int(input("Enter the number of the project you want to edit: "))
+
+    try:
+        choice = int(input("Enter the number of the project you want to edit: "))
+    except ValueError:
+        print("\033[91m\nInvalid input. Please enter a valid number.\033[0m")
+        return
 
     choice -= 1
 
@@ -76,25 +82,29 @@ def edit_project(projects, user_email):
     selected_project = projects[choice]
     
     if selected_project['owner'] != user_email:
-        print("You are not the owner of this project. Access denied.")
+        print("\033[91m\nYou are not the owner of this project. Access denied.\033[0m")
         return
 
     print("Edit project:")
     selected_project['title'] = input(f"New title ({selected_project['title']}): ")
-
     selected_project['details'] = input(f"New details ({selected_project['details']}): ")
+    try:
+        new_total_target = float(input(f"New total target ({selected_project['total_target']} EGP): "))
+    except ValueError:
+        print("\033[91m\nInvalid input. Please enter a valid number.\033[0m")
+        return
 
-    selected_project['total_target'] = float(input(f"New total target ({selected_project['total_target']} EGP): "))
+    selected_project['total_target'] = new_total_target
 
     start_time = input(f"New start time ({selected_project['start_time']}): ")
     if not validate_date(start_time):
-        print("Invalid date format.")
+        print("\033[91mInvalid date format.\033[0m")
         return
     selected_project['start_time'] = start_time
 
     end_time = input(f"New end time ({selected_project['end_time']}): ")
     if not validate_date(end_time):
-        print("Invalid date format.")
+        print("\033[91mInvalid date format.\033[0m")
         return
     selected_project['end_time'] = end_time
 
@@ -108,7 +118,12 @@ def delete_project(projects, user_email):
     print("Please select a project to delete:")
     for i, project in enumerate(projects):
         print(f"{i + 1}. {project['title']}")
-    choice = int(input("Enter the number of the project you want to delete: "))
+
+    try:
+        choice = int(input("Enter the number of the project you want to delete: "))
+    except ValueError:
+        print("\033[91m\nInvalid input. Please enter a valid number.\033[0m")
+        return
 
     choice -= 1
 
@@ -125,8 +140,8 @@ def delete_project(projects, user_email):
             file = open('projects.json', 'w')
             json.dump(projects, file, indent=1)
             file.close()
-            print("Project deleted successfully!")
+            print("\033[92mProject deleted successfully!\033[0m")
         else:
-            print("Deletion canceled.")
+            print("\033[91mDeletion canceled.\033[0m")
     else:
-        print("Access denied: You are not the owner of this project.")
+        print("\033[91m\nYou are not the owner of this project. Access denied.\033[0m")
